@@ -2,6 +2,11 @@ Recipes
 =======
 This is a list of recipes for getting stuff done with this project.
 
+Django recipes
+=====
+
+
+
 Setting up
 ==========
 Follow the setup from afrims
@@ -49,19 +54,18 @@ i.e. the one from afrims-dev/bin
 
 Get the latest version of rapidsms
 =======
+# you actually need the Dimagi version at this time
+
     pip uninstall rapidsms
-    pip install git+git://github.com/rapidsms/rapidsms.git#egg=RapidSMS
+    pip install git+https://github.com/dimagi/rapidsms.git#egg=RapidSMS
 
-##### Setup rtwilio
-cd ~/nSource/rapidsms
-git clone https://github.com/caktus/rapidsms-twilio.git
-cd rapidsms-twilio
-python setup.py install
-# not currently working b/c of Account error
-self.account = twilio.Account(self.config['account_sid'],
-AttributeError: 'module' object has no attribute 'Account'
+Setup the db
+=====
+./manage.py syncdb
+./manage.py migrate
 
-##### Setup kannel
+To Setup kannel
+======
 # allow vm kannel to accept message from my host
 sshb
 # ssh into my virtual box with kannel installed

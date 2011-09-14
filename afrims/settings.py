@@ -70,11 +70,11 @@ INSTALLED_APPS = [
 # to add it here, also, to expose it in the rapidsms ui.
 RAPIDSMS_TABS = [
     ("afrims.apps.broadcast.views.dashboard", "Dashboard"),    
-    ("afrims.apps.broadcast.views.send_message", "Send a Message"),
-    ("afrims.apps.reminders.views.dashboard", "Appointment Reminders"),
-    ("broadcast-forwarding", "Forwarding"),
-    ("afrims.apps.groups.views.list_groups", "Groups"),
     ("afrims.apps.groups.views.list_contacts","People"),
+    ("afrims.apps.groups.views.list_groups", "Groups"),
+    ("afrims.apps.broadcast.views.send_message", "Send a Message"),
+    #("afrims.apps.reminders.views.dashboard", "Appointment Reminders"),
+    ("broadcast-forwarding", "Forwarding"),
 #    ("settings", "Settings"),
 #    ("rapidsms.contrib.messagelog.views.message_log",       "Message Log"),
 
@@ -82,9 +82,6 @@ RAPIDSMS_TABS = [
 #    ("rapidsms.contrib.locations.views.locations",          "Map"),
 #    ("rapidsms.contrib.scheduler.views.index",              "Event Scheduler"),
  #   ("rapidsms.contrib.httptester.views.generate_identity", "Message Tester"),
-
-#    ("afrims.apps.reminder.views.dashboard", "Reminder"),
-
 ]
 
 
@@ -121,7 +118,7 @@ STATIC_ROOT = os.path.join(PROJECT_PATH, '..', 'static_files')
 
 # Specify a logo URL for the dashboard layout.html. This logo will show up
 # at top left for every tab
-LOGO_LEFT_URL = '%simages/trialconnect.png' % STATIC_URL
+LOGO_LEFT_URL = '%simages/logo.png' % STATIC_URL
 LOGO_RIGHT_URL = '%simages/tatrc_logo.png' % STATIC_URL
 SITE_TITLE = " "
 BASE_TEMPLATE = "layout.html"

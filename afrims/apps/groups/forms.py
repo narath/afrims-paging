@@ -63,12 +63,15 @@ class ContactForm(forms.ModelForm):
             kwargs['initial'] = {'groups': list(pks)}
         super(ContactForm, self).__init__(*args, **kwargs)
         self.fields['groups'].widget = forms.CheckboxSelectMultiple()
-        self.fields['groups'].queryset = Group.objects.exclude(name=settings.DEFAULT_SUBJECT_GROUP_NAME).order_by('name')
+        self.fields['groups'].queryset = Group.objects.exclude(is_personal_group=True).exclude(name=settings.DEFAULT_SUBJECT_GROUP_NAME).order_by('name')
         self.fields['groups'].required = False
         for name in ('first_name', 'last_name', 'phone'):
             self.fields[name].required = True
 
     def save(self, commit=True):
         instance = super(ContactForm, self).save()
-        instance.groups = self.cleaned_data['groups']
+        # here we need to make sure we preserve the personal group
+        # we do so by adding the required group to the cleaned groups
+        add_groups = self.cleaned_data['groups'] | instance.groups.filter(is_personal_group=True)
+        instance.groups = add_groups
         return instance

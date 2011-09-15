@@ -73,7 +73,7 @@ RAPIDSMS_TABS = [
     ("afrims.apps.groups.views.list_contacts","People"),
     ("afrims.apps.groups.views.list_groups", "Groups"),
     ("afrims.apps.broadcast.views.send_message", "Send a Message"),
-    #("afrims.apps.reminders.views.dashboard", "Appointment Reminders"),
+    ("afrims.apps.reminders.views.dashboard", "Appointment Reminders"),
     ("broadcast-forwarding", "Forwarding"),
 #    ("settings", "Settings"),
 #    ("rapidsms.contrib.messagelog.views.message_log",       "Message Log"),

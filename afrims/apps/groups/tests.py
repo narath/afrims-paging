@@ -35,6 +35,8 @@ class GroupCreateDataTest(CreateDataTest):
                 'last_name': self.random_string(8),
                 'email': 'test@abc.com',
                 'phone': '+31112223333',
+                'title' : 'Resident',
+                'department' : 'Medicine',
             }
         data.update(initial_data)
         return data
@@ -60,15 +62,20 @@ class GroupFormTest(GroupCreateDataTest):
     def test_create_contact(self):
         """ Test contact creation functionality with form """
         group1 = self.create_group()
+        self.assertFalse(group1.is_personal_group)
         group2 = self.create_group()
         data = self._data({'groups': [group1.pk]})
         form = group_forms.ContactForm(data)
         self.assertTrue(form.is_valid())
         contact = form.save()
         self.assertEqual(contact.first_name, data['first_name'])
+        self.assertEqual(contact.personal_group_name(),"%s %s(%s,%s)" % (data['first_name'],data['last_name'],data['title'],data['department']))
         self.assertEqual(contact.groups.count(), 1)
         self.assertTrue(contact.groups.filter(pk=group1.pk).exists())
         self.assertFalse(contact.groups.filter(pk=group2.pk).exists())
+
+        # make sure the personal group has been created
+        self.assertTrue(contact.groups.filter(name=contact.personal_group_name()).exists())
 
     def test_edit_contact(self):
 

@@ -2,10 +2,25 @@ Recipes
 =======
 This is a list of recipes for getting stuff done with this project.
 
-Django recipes
+Most commonly used
 =====
+# aliases i use to setup the environ
+rapaf
+rapafv
 
+./manage.py runrouter
+./manage.py runserver
+./manage.py
 
+couchdb
+~/start_postgres.sh
+~/stop_postgres.sh
+
+./manage.py test
+./manage.py test afrims.apps.groups
+
+# if you added another field to contacts, you can update the migrations with South
+./manage.py schemamigration rapidsms --auto
 
 Setting up
 ==========
@@ -39,7 +54,13 @@ dev\
         requirements\
         services\
 
-    afrims-dev
+    afrims-dev\
+        (virtual env settings here)
+
+    submodules\
+        auditcare
+        couchdb
+        dimagi-utils
 
 Setup ~/.bash_profile shortcuts:
 ======
@@ -59,10 +80,63 @@ Get the latest version of rapidsms
     pip uninstall rapidsms
     pip install git+https://github.com/dimagi/rapidsms.git#egg=RapidSMS
 
+
 Setup the db
 =====
 ./manage.py syncdb
 ./manage.py migrate
+
+Get the submodules
+=====
+TODO: add to afrims readme
+in the root dir
+git submodules update --init
+
+Add missing pips
+=====
+TODO: add to afrims requirements
+pip install couchdbkit
+
+Get the tests running
+====
+./manage.py tests
+(or in PyCharm setup a Django test - this will run tests for you, has the benefit of hyperlinks back to your code)
+
+Setting up CouchDB
+====
+
+http://wiki.apache.org/couchdb/Installing_on_OSX
+brew install couchdb
+# note: takes a long time - especially for the compile process
+
+# on ubuntu
+sudo apt-get install couchdb
+# note: installs an older version but for dev purposes should be okay
+
+# now create your database
+http://127.0.0.1:5984/_utils
+create couchlog
+create rapidsms
+# add user to rapidsms (don't worry about the passwd for your dev server
+open rapidsms
+click on security
+in admin: ["rapid_user"]
+
+# my staging server
+http://192.168.1.204:5984/_utils/
+
+# to use curl
+HOST="http://192.168.1.204:5984"
+curl -X GET $HOST/_all_dbs
+
+# make sure couchlog is included in your settings:
+COUCHDB_APPS=[
+    'couchlog',
+    'auditcare',
+    ]
+
+SETTING UP BACKENDS
+========
 
 To Setup kannel
 ======

@@ -22,6 +22,8 @@ couchdb
 # if you added another field to contacts, you can update the migrations with South
 ./manage.py schemamigration rapidsms --auto
 
+
+
 Setting up
 ==========
 Follow the setup from afrims
@@ -57,11 +59,6 @@ dev\
     afrims-dev\
         (virtual env settings here)
 
-    submodules\
-        auditcare
-        couchdb
-        dimagi-utils
-
 Setup ~/.bash_profile shortcuts:
 ======
 alias rapafv='source ~/nSource/rapidsms/afrims-dev/bin/activate'
@@ -85,12 +82,6 @@ Setup the db
 =====
 ./manage.py syncdb
 ./manage.py migrate
-
-Get the submodules
-=====
-TODO: add to afrims readme
-in the root dir
-git submodules update --init
 
 Add missing pips
 =====

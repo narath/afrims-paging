@@ -70,8 +70,7 @@ class ContactForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super(ContactForm, self).save()
-        # here we need to make sure we preserve the personal group
-        # we do so by adding the required group to the cleaned groups
-        add_groups = self.cleaned_data['groups'] | instance.groups.filter(is_personal_group=True)
-        instance.groups = add_groups
+        pg_group = instance.groups.filter(is_personal_group=True)[0]
+        instance.groups = self.cleaned_data['groups']
+        instance.groups.add(pg_group)
         return instance

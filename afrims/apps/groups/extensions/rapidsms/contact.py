@@ -22,7 +22,7 @@ class ContactExtra(models.Model):
     # personal_group
     # automatically created group : name (title, dept)
     def personal_group_name(self):
-        return "%s(%s,%s)" % (self.name,self.title,self.department)
+        return "%s %s(%s,%s)" % (self.first_name, self.last_name,self.title,self.department)
 
     def save(self, **kwargs):
         self.name = "%s %s" % (self.first_name, self.last_name)

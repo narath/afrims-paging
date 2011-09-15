@@ -70,12 +70,26 @@ class GroupFormTest(GroupCreateDataTest):
         contact = form.save()
         self.assertEqual(contact.first_name, data['first_name'])
         self.assertEqual(contact.personal_group_name(),"%s %s(%s,%s)" % (data['first_name'],data['last_name'],data['title'],data['department']))
-        self.assertEqual(contact.groups.count(), 1)
+        self.assertEqual(contact.groups.count(), 2) # remember user always has a personal group
         self.assertTrue(contact.groups.filter(pk=group1.pk).exists())
         self.assertFalse(contact.groups.filter(pk=group2.pk).exists())
 
         # make sure the personal group has been created
         self.assertTrue(contact.groups.filter(name=contact.personal_group_name()).exists())
+
+        # cannot create contact with same personal group
+        dup_contact_data = {
+                'first_name': contact.first_name,
+                'last_name': contact.last_name,
+                'email': 'test@abc.com',
+                'phone': '+31112223333',
+                'title' : 'Resident',
+                'department' : 'Medicine',
+        }
+        contact2 = Contact(**dup_contact_data)
+        contact2.clean()
+        contact2.save()
+
 
     def test_edit_contact(self):
 

@@ -8,6 +8,10 @@ from afrims.apps.broadcast.models import Broadcast, ForwardingRule
 from afrims.apps.broadcast.validators import validate_keyword
 from afrims.apps.groups.models import Group
 
+import logging
+logger = logging.getLogger('afrims.apps.broadcast.forms')
+
+
 class SimpleSendForm(forms.ModelForm):
     """ Form to send a message to groups using a simpler interface than broadcast forms
         by default all messages are sent now and one time """
@@ -22,8 +26,21 @@ class SimpleSendForm(forms.ModelForm):
         exclude = (
             'date_created', 'date_last_notified', 'date_next_notified',
             'date','schedule_end_date','schedule_frequency','weekdays','months',
+            'date','schedule_end_date','schedule_frequency','weekdays','months',
             'forward',
             )
+
+    def save(self, commit=True):
+        logger.error('In save!')
+        broadcast = super(SimpleSendForm, self).save(commit=False)
+        broadcast.date = datetime.datetime.now()
+        broadcast.schedule_frequency = 'one-time'
+        if commit:
+            broadcast.save()
+            self.save_m2m()
+            logger.error('Saved!')
+        return broadcast
+
 
 class BroadcastForm(forms.ModelForm):
     """ Form to send a broadcast message """

@@ -21,15 +21,23 @@ from afrims.apps.reminders.models import SentNotification
 
 one_day = datetime.timedelta(days=1)
 
+import logging
+logger = logging.getLogger('afrims.apps.broadcast.views')
+
+
 @login_required
 @permission_required('groups.can_use_send_a_message_tab', login_url='/access_denied/')
 @transaction.commit_on_success
 def send_simple_message(request, broadcast_id=None):
+    logger.debug("hello from debug")
+    logger.info("hello from info")
+    logger.error("hello from error")
     if broadcast_id:
         broadcast = get_object_or_404(Broadcast, pk=broadcast_id)
     else:
         broadcast = None
     if request.method == 'POST':
+        logger.error("hey im saving a POST")
         form = SimpleSendForm(request.POST, instance=broadcast)
         if form.is_valid():
             broadcast = form.save()

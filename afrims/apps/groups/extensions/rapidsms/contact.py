@@ -22,7 +22,25 @@ class ContactExtra(models.Model):
     # personal_group
     # automatically created group : name (title, dept)
     def personal_group_name(self):
-        return "%s %s(%s,%s)" % (self.first_name, self.last_name,self.title,self.department)
+        # todo.low: generic create param str for array seems reasonable, remove all blank, if none, return blank
+        # note: use str.format here based on recommendation from http://docs.python.org/release/2.6.7/tutorial/inputoutput.html#fancier-output-formatting
+        # todo.low: update all str % to use str.format
+        if self.title=='' and self.department=='':
+            return '{0} {1}'.format(self.first_name,self.last_name)
+        elif self.title!='' and self.department=='':
+            return '{0} {1} ({2})'.format(self.first_name,self.last_name,self.title)
+        elif self.title=='' and self.department!='':
+            return '{0} {1} ({2})'.format(self.first_name,self.last_name,self.department)
+        else:
+            return '{0} {1} ({2},{3})'.format(self.first_name,self.last_name,self.title,self.department)
+
+    def personal_group(self):
+        pgroups = self.groups.filter(is_personal_group=True)
+        if pgroups.count()==0:
+            raise "No personal group defined for contact %s" % self
+        if pgroups.count()>1:
+            raise "Unexpected error, %d personal groups for contact %s" % pgrounds.count(),self
+        return pgroups[0]
 
     def save(self, **kwargs):
         self.name = "%s %s" % (self.first_name, self.last_name)

@@ -3,6 +3,7 @@ from django.contrib.auth.models import User, Permission
 from django.core.urlresolvers import reverse
 from django.forms.models import model_to_dict
 from django.core.exceptions import ValidationError
+import re
 
 from rapidsms.models import Contact, Backend, Connection
 from rapidsms.tests.harness import MockRouter
@@ -69,7 +70,6 @@ class GroupFormTest(GroupCreateDataTest):
         self.assertTrue(form.is_valid())
         contact = form.save()
         self.assertEqual(contact.first_name, data['first_name'])
-        self.assertEqual(contact.personal_group_name(),"%s %s(%s,%s)" % (data['first_name'],data['last_name'],data['title'],data['department']))
         self.assertEqual(contact.groups.count(), 2) # remember user always has a personal group
         self.assertTrue(contact.groups.filter(pk=group1.pk).exists())
         self.assertFalse(contact.groups.filter(pk=group2.pk).exists())
@@ -87,24 +87,31 @@ class GroupFormTest(GroupCreateDataTest):
                 'department' : 'Medicine',
         }
         contact2 = Contact(**dup_contact_data)
-        contact2.clean()
-        contact2.save()
-
-
+        try:
+            contact2.clean()
+            self.assertFalse(True,"Expected ValidationError for contact with same personal group name")
+        except ValidationError:
+            # expected
+            print "expected this error"
+        
     def test_edit_contact(self):
 
         """ Test contact edit functionality with form """
         group1 = self.create_group()
         group2 = self.create_group()
         contact = self.create_contact()
+        pg_name_orig = contact.personal_group().name
         contact.groups.add(group1)
-        data = self._data({'groups': [group2.pk]}, instance=contact)
+        data = self._data({'groups': [group2.pk], 'first_name':'Roger'}, instance=contact)
         form = group_forms.ContactForm(data, instance=contact)
         self.assertTrue(form.is_valid(), dict(form.errors))
         contact = form.save()
-        self.assertEqual(contact.groups.count(), 1)
+        self.assertEqual(contact.groups.count(), 2) # remember always has a personal group as well
         self.assertFalse(contact.groups.filter(pk=group1.pk).exists())
         self.assertTrue(contact.groups.filter(pk=group2.pk).exists())
+        self.assertEqual(contact.personal_group().name,contact.personal_group_name())
+        self.assertNotEqual(contact.personal_group().name,pg_name_orig)
+
 
     def test_no_subjects(self):
         """New contacts cannot be added to the subjects group"""
@@ -113,6 +120,44 @@ class GroupFormTest(GroupCreateDataTest):
         data = self._data({'groups': [subjects_group.pk]})
         form = group_forms.ContactForm(data)
         self.assertFalse(form.is_valid())
+
+    def test_delete_personal_group(self):
+        """When a contact is deleted the personal group should be deleted as well"""
+        contact = self.create_contact()
+        pg = contact.personal_group()
+        self.assertTrue(Group.objects.filter(pk=pg.pk).exists())
+        contact.delete()
+        self.assertFalse(Contact.objects.filter(pk=contact.pk).exists())
+        self.assertFalse(Group.objects.filter(pk=pg.pk).exists())
+
+    def test_cleaner_personal_group_name(self):
+        PERSONAL_GROUP_WITH_TITLE_AND_DEPT = r'\w+\s\w+\s\(\w+,\w+\)'
+        PERSONAL_GROUP_WITH_TITLE = r'\w+\s\w+\s\(\w+\)'
+        PERSONAL_GROUP_WITH_DEPT = r'\w+\s\w+\s\(\w+\)'
+        PERSONAL_GROUP_NO_TITLE_OR_DEPT = r'\w+\s\w+'
+
+        contact = self.create_contact()
+        self.assertNotEqual(contact.title,'')
+        self.assertNotEqual(contact.department,'')
+        self.assertTrue(re.match(PERSONAL_GROUP_WITH_TITLE_AND_DEPT,contact.personal_group_name()))
+
+        save_title = contact.title
+        contact.title = ''
+        self.assertEqual(contact.title,'')
+        self.assertNotEqual(contact.department,'')
+        self.assertTrue(re.match(PERSONAL_GROUP_WITH_TITLE,contact.personal_group_name()))
+
+        contact.title = save_title
+        contact.department = ''
+        self.assertNotEqual(contact.title,'')
+        self.assertEqual(contact.department,'')
+        self.assertTrue(re.match(PERSONAL_GROUP_WITH_DEPT,contact.personal_group_name()))
+
+        contact.title = ''
+        self.assertEqual(contact.title,'')
+        self.assertEqual(contact.department,'')
+        self.assertTrue(re.match(PERSONAL_GROUP_NO_TITLE_OR_DEPT,contact.personal_group_name()))
+        
 
 
 class GroupViewTest(CreateDataTest):

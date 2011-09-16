@@ -4,6 +4,8 @@ This is a list of recipes for getting stuff done with this project.
 
 Most commonly used
 =====
+git flow feature finish personal_groups
+
 # aliases i use to setup the environ
 rapaf
 rapafv
@@ -22,8 +24,6 @@ couchdb
 # if you added another field to contacts, you can update the migrations with South
 ./manage.py schemamigration rapidsms --auto
 
-
-
 Setting up
 ==========
 Follow the setup from afrims
@@ -34,7 +34,7 @@ Forked afrims
 forked on github
 git clone
 cd
-git remote add upstream
+git remote add upstream https://github.com/afrims/afrims.git
 
 cp localsettings.py.example localsettings.py
 
@@ -42,10 +42,26 @@ modify to use sqlite
 
 # should be able to run it now
 
+How to get an update from afrims
+======
+# i generally do this as part of a feature
+
+git fetch upstream
+git merge upstream/develop
+
+
 Make sure you have virtualenv setup correctly
 =====
 virtualenv afrims-dev
 source afrims-dev/bin/activate
+
+Specific django version required
+=========
+1.2.4
+gotcha: make sure you don't have it installed in your home dir, else pip won't override this
+pip freeze
+
+pip install django==1.2.4 --upgrade
 
 Recommended dir structure
 ======

@@ -29,15 +29,11 @@ logger = logging.getLogger('afrims.apps.broadcast.views')
 @permission_required('groups.can_use_send_a_message_tab', login_url='/access_denied/')
 @transaction.commit_on_success
 def send_simple_message(request, broadcast_id=None):
-    logger.debug("hello from debug")
-    logger.info("hello from info")
-    logger.error("hello from error")
     if broadcast_id:
         broadcast = get_object_or_404(Broadcast, pk=broadcast_id)
     else:
         broadcast = None
     if request.method == 'POST':
-        logger.error("hey im saving a POST")
         form = SimpleSendForm(request.POST, instance=broadcast)
         if form.is_valid():
             broadcast = form.save()
@@ -67,13 +63,13 @@ def lookup_groups(request):
     response['Content-Type'] = "text/javascript"
     search_for = request.GET["term"]
 
+    groups = Group.objects.filter(name__contains=search_for).all()
     a = []
-    for g in  Group.objects.filter(name__contains=search_for).all():
-        item = {}
-        item["id"] = g.pk
-        item["label"] = g.name
-        item["value"] = g.name
-        a.append(item)
+    if groups.count()>0:
+        for g in groups:
+            a.append({'id':g.pk,'label':g.name,'value':g.name})
+    else:
+        a.append({'id':0,'label':'(no matches)','value':''})
 
     response.write(json.dumps(a))
 

@@ -1,4 +1,4 @@
-{% extends "broadcast/base.html" %}
+{% extends "afrims/layout.html" %}
 
 {% block title %}{% if form.instance.pk %}Edit Message{% else %}Send a Message{% endif %}{% endblock %}
 
@@ -17,44 +17,30 @@
     <link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}css/jquery.multiselect.css"/>
 {% endblock %}
 
-{% block right %}
+{% block content %}
 
     <style>
     .ui-autocomplete-loading { background: white url('/static/images/loader.gif') right center no-repeat; }
+    #id_send_to { width: 25em }
     </style>
     <script>
     $(function() {
-        function log( message ) {
-            $( "<div/>" ).text( message ).prependTo( "#log" );
-            $( "#log" ).scrollTop( 0 );
-        }
+//        function log( message ) {
+//            $( "<div/>" ).text( message ).prependTo( "#log" );
+//            $( "#log" ).scrollTop( 0 );
+//        }
 
-        $( "#send_to" ).autocomplete({
+        $( "#id_send_to" ).autocomplete({
             source: "/broadcast/lookup_groups",
-            minLength: 2,
-            select: function( event, ui ) {
-                log( ui.item ?
-                    "Selected: " + ui.item.value + " aka " + ui.item.id :
-                    "Nothing selected, input was " + this.value );
-            }
+            minLength: 2
+//            select: function( event, ui ) {
+//                log( ui.item ?
+//                    "Selected: " + ui.item.value + " aka " + ui.item.id :
+//                    "Nothing selected, input was " + this.value );
+//            }
         });
     });
     </script>
-
-
-<div class="demo">
-
-<div class="ui-widget">
-	<label for="send_to">Send To: </label>
-	<input id="send_to" />
-</div>
-
-<div class="ui-widget" style="margin-top:2em; font-family:Arial">
-	Result:
-	<div id="log" style="height: 200px; width: 300px; overflow: auto;" class="ui-widget-content"></div>
-</div>
-
-</div><!-- End demo -->
 
     <div class="module message-form">
         <h2>{% if form.instance.pk %}Edit Message{% else %}Send a Message{% endif %}</h2>
@@ -62,16 +48,22 @@
             {{ form.non_field_errors }}
             {% csrf_token %}
             <table>
-                <tr><td>
-                    {{ form.groups.errors }}
-                    <label for="id_groups">To:</label>
-                    {{ form.groups }}
-                </td></tr>
-                <tr><td>
-                    {{ form.body.errors }}
-                    <label for="id_body">Message:</label>
-                    {{ form.body }}
-                </td></tr>
+                <tr>
+                    <td><label for="id_send_to">To:</label></td>
+                    <td>
+                        {{ form.send_to.errors }}
+                        <div class="ui-widget">
+                        {{ form.send_to }}
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="id_body">Message:</label></td>
+                    <td>
+                        {{ form.body.errors }}
+                        {{ form.body }}
+                    </td>
+                </tr>
             </table>
             <div class='form-action'>
                 {% if form.instance.pk %}

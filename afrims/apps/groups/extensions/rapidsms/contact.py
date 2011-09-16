@@ -37,9 +37,9 @@ class ContactExtra(models.Model):
     def personal_group(self):
         pgroups = self.groups.filter(is_personal_group=True)
         if pgroups.count()==0:
-            raise "No personal group defined for contact %s" % self
+            raise Exception("No personal group defined for contact %s" % self)
         if pgroups.count()>1:
-            raise "Unexpected error, %d personal groups for contact %s" % pgrounds.count(),self
+            raise Exception("Unexpected error, %d personal groups for contact %s" % (pgroups.count(),self))
         return pgroups[0]
 
     def save(self, **kwargs):

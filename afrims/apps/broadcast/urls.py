@@ -3,9 +3,10 @@ from afrims.apps.broadcast import views
 
 
 urlpatterns = patterns('',
-    url(r'^send/$', views.send_message, name='send-message'),
+    url(r'^send/$', views.send_simple_message, name='send-simple-message'),
+    url(r'^send_broadcast/$', views.send_scheduled_message, name='send-scheduled-message'),
     url(r'^schedule/$', views.schedule, name='broadcast-schedule'),
-    url(r'^schedule/(?P<broadcast_id>\d+)/edit/$', views.send_message,
+    url(r'^schedule/(?P<broadcast_id>\d+)/edit/$', views.send_scheduled_message,
         name='edit-broadcast'),
     url(r'^schedule/(?P<broadcast_id>\d+)/delete/$', views.delete_broadcast,
         name='delete-broadcast'),

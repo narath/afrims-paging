@@ -8,6 +8,22 @@ from afrims.apps.broadcast.models import Broadcast, ForwardingRule
 from afrims.apps.broadcast.validators import validate_keyword
 from afrims.apps.groups.models import Group
 
+class SimpleSendForm(forms.ModelForm):
+    """ Form to send a message to groups using a simpler interface than broadcast forms
+        by default all messages are sent now and one time """
+    #send_to = forms.CharField(label="To", max_length=50)
+    #send_from = forms.CharField(label="From", max_length=50)
+    groups = forms.ModelMultipleChoiceField(queryset=Group.objects)
+    body = forms.CharField(label="Message", max_length=140,
+                           widget=forms.Textarea)
+
+    class Meta(object):
+        model = Broadcast
+        exclude = (
+            'date_created', 'date_last_notified', 'date_next_notified',
+            'date','schedule_end_date','schedule_frequency','weekdays','months',
+            'forward',
+            )
 
 class BroadcastForm(forms.ModelForm):
     """ Form to send a broadcast message """

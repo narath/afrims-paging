@@ -4,7 +4,9 @@ This is a list of recipes for getting stuff done with this project.
 
 Most commonly used
 =====
-git flow feature finish personal_groups
+git add .
+git commit
+git flow feature finish simple_send
 
 # aliases i use to setup the environ
 rapaf

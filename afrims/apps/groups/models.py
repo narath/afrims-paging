@@ -2,6 +2,9 @@ from django.db import models
 
 from rapidsms.models import Contact
 
+import logging
+logger = logging.getLogger('afrims.apps.groups.models')
+
 
 class Group(models.Model):
     """ Organize RapidSMS contacts into groups """
@@ -32,35 +35,33 @@ class Group(models.Model):
 
 from django.db.models.signals import post_save, post_delete
 
-import sys
-
 def contact_post_save(sender, **kwargs):
     c = kwargs['instance']
-    sys.stderr.write("post_save for contact %s\n" % c.name)
+    logger.debug("post_save for contact %s\n" % c.name)
     g_name = c.personal_group_name()
     # does this personal group exist already
     p_groups = c.groups.filter(is_personal_group=True)
     if p_groups.count()==1:
         pg = p_groups[0]
         if pg.name != g_name:
-            sys.stderr.write("Updating personal group name from %s to %s \n" % (pg.name,g_name))
+            logger.debug("Updating personal group name from %s to %s \n" % (pg.name,g_name))
             pg.name = g_name
             pg.save()
     else:
         # group does not exist
         g = c.groups.create(name=g_name, is_personal_group=True)
         g.save()
-        sys.stderr.write("Created personal group %s \n" % g)
+        logger.debug("Created personal group %s \n" % g)
 post_save.connect(contact_post_save, sender=Contact)
 
 def contact_post_delete(sender, **kwargs):
     c = kwargs['instance']
-    sys.stderr.write("post_delete for contact %s \n" % c.name)
+    logger.debug("post_delete for contact %s \n" % c.name)
     # the record has been deleted already, so the m2m join records have been deleted
     # so we just remove the personal group by searching the groups
     p_groups = Group.objects.filter(name=c.personal_group_name(),is_personal_group=True)
     if p_groups.count()!=1:
-        raise "Unexpected error: %d personal groups when deleting contact personal group %s" % (p_groups.count(),c.personal_group_name())
+        logger.warning("Unexpected error: %d personal groups when deleting contact personal group %s" % (p_groups.count(),c.personal_group_name()))
     p_groups.delete()
 post_delete.connect(contact_post_delete, sender=Contact)
 

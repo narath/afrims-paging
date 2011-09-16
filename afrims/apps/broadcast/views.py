@@ -15,7 +15,7 @@ from django.utils import simplejson as json
 
 from rapidsms.contrib.messagelog.models import Message
 
-from afrims.apps.broadcast.forms import BroadcastForm, ForwardingRuleForm, ReportForm, RecentMessageForm
+from afrims.apps.broadcast.forms import SimpleSendForm, BroadcastForm, ForwardingRuleForm, ReportForm, RecentMessageForm
 from afrims.apps.broadcast.models import Broadcast, BroadcastMessage, ForwardingRule
 from afrims.apps.reminders.models import SentNotification
 
@@ -24,7 +24,36 @@ one_day = datetime.timedelta(days=1)
 @login_required
 @permission_required('groups.can_use_send_a_message_tab', login_url='/access_denied/')
 @transaction.commit_on_success
-def send_message(request, broadcast_id=None):
+def send_simple_message(request, broadcast_id=None):
+    if broadcast_id:
+        broadcast = get_object_or_404(Broadcast, pk=broadcast_id)
+    else:
+        broadcast = None
+    if request.method == 'POST':
+        form = SimpleSendForm(request.POST, instance=broadcast)
+        if form.is_valid():
+            broadcast = form.save()
+            if broadcast_id:
+                info = 'Broadcast successfully saved'
+            else:
+                info = 'Message queued for delivery'
+            messages.info(request, info)
+            return HttpResponseRedirect(reverse('broadcast-schedule'))
+    else:
+        form = SimpleSendForm(instance=broadcast)
+    broadcasts = Broadcast.objects.exclude(schedule_frequency__isnull=True)
+    context = {
+        'form': form,
+        'broadcasts': broadcasts.order_by('date'),
+    }
+    return render_to_response('broadcast/send_simple_message.html', context,
+                              RequestContext(request))
+
+
+@login_required
+@permission_required('groups.can_use_send_a_message_tab', login_url='/access_denied/')
+@transaction.commit_on_success
+def send_scheduled_message(request, broadcast_id=None):
     if broadcast_id:
         broadcast = get_object_or_404(Broadcast, pk=broadcast_id)
     else:

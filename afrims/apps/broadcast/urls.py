@@ -23,4 +23,5 @@ urlpatterns = patterns('',
         name='broadcast-usage-graph-data'),
     url('^message-data/$', views.last_messages,
         name='broadcast-usage-recent-messages'),
+    url('^lookup_groups$', views.lookup_groups, name='lookup-groups'),
 )

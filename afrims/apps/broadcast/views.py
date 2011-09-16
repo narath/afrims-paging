@@ -49,6 +49,27 @@ def send_simple_message(request, broadcast_id=None):
     return render_to_response('broadcast/send_simple_message.html', context,
                               RequestContext(request))
 
+# todo: need an ajax request that sends login info
+# @login_required
+def lookup_groups(request):
+    import json
+    from afrims.apps.groups.models import Group
+
+    response = HttpResponse()
+    response['Content-Type'] = "text/javascript"
+    search_for = request.GET["term"]
+
+    a = []
+    for g in  Group.objects.filter(name__contains=search_for).all():
+        item = {}
+        item["id"] = g.pk
+        item["label"] = g.name
+        item["value"] = g.name
+        a.append(item)
+
+    response.write(json.dumps(a))
+
+    return response
 
 @login_required
 @permission_required('groups.can_use_send_a_message_tab', login_url='/access_denied/')
@@ -75,7 +96,7 @@ def send_scheduled_message(request, broadcast_id=None):
         'form': form,
         'broadcasts': broadcasts.order_by('date'),
     }
-    return render_to_response('broadcast/send_message.html', context,
+    return render_to_response('broadcast/send_scheduled_message.html', context,
                               RequestContext(request))
 
 

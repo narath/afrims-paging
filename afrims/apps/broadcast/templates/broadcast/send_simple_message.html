@@ -18,6 +18,44 @@
 {% endblock %}
 
 {% block right %}
+
+    <style>
+    .ui-autocomplete-loading { background: white url('/static/images/loader.gif') right center no-repeat; }
+    </style>
+    <script>
+    $(function() {
+        function log( message ) {
+            $( "<div/>" ).text( message ).prependTo( "#log" );
+            $( "#log" ).scrollTop( 0 );
+        }
+
+        $( "#send_to" ).autocomplete({
+            source: "/broadcast/lookup_groups",
+            minLength: 2,
+            select: function( event, ui ) {
+                log( ui.item ?
+                    "Selected: " + ui.item.value + " aka " + ui.item.id :
+                    "Nothing selected, input was " + this.value );
+            }
+        });
+    });
+    </script>
+
+
+<div class="demo">
+
+<div class="ui-widget">
+	<label for="send_to">Send To: </label>
+	<input id="send_to" />
+</div>
+
+<div class="ui-widget" style="margin-top:2em; font-family:Arial">
+	Result:
+	<div id="log" style="height: 200px; width: 300px; overflow: auto;" class="ui-widget-content"></div>
+</div>
+
+</div><!-- End demo -->
+
     <div class="module message-form">
         <h2>{% if form.instance.pk %}Edit Message{% else %}Send a Message{% endif %}</h2>
         <form method="POST" action="#" id="broadcast-form" class='buttons'>

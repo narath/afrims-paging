@@ -8,6 +8,52 @@ from afrims.apps.broadcast.models import Broadcast, ForwardingRule
 from afrims.apps.broadcast.validators import validate_keyword
 from afrims.apps.groups.models import Group
 
+import logging
+logger = logging.getLogger('afrims.apps.broadcast.forms')
+
+
+class SimpleSendForm(forms.ModelForm):
+    """ Form to send a message to groups using a simpler interface than broadcast forms
+        by default all messages are sent now and one time """
+    send_to = forms.CharField(label="To", max_length=100)
+    #send_from = forms.CharField(label="From", max_length=50)
+    #groups = forms.ModelMultipleChoiceField(queryset=Group.objects)
+    body = forms.CharField(label="Message", max_length=140,
+                           widget=forms.Textarea)
+
+    class Meta(object):
+        model = Broadcast
+        exclude = (
+            'date_created', 'date_last_notified', 'date_next_notified',
+            'date','schedule_end_date','schedule_frequency','weekdays','months',
+            'date','schedule_end_date','schedule_frequency','weekdays','months',
+            'forward','groups'
+            )
+
+    def clean(self):
+        # make sure the group exists
+        groups = Group.objects.filter(name=self.cleaned_data['send_to']).all()
+        if groups.count()!=1:
+            raise forms.ValidationError('Invalid group name')
+
+        # make sure there are some members
+        # since this is an "immediate" message
+        contacts = groups[0].contacts.all()
+        if contacts.count()==0:
+            raise forms.ValidationError('Sorry, there are no members in that group')
+        return self.cleaned_data
+
+    def save(self, commit=True):
+        logger.error('In save!')
+        broadcast = super(SimpleSendForm, self).save(commit=False)
+        broadcast.date = datetime.datetime.now()
+        broadcast.schedule_frequency = 'one-time'
+        if commit:
+            broadcast.save()
+            self.save_m2m()
+            logger.error('Saved!')
+        return broadcast
+
 
 class BroadcastForm(forms.ModelForm):
     """ Form to send a broadcast message """

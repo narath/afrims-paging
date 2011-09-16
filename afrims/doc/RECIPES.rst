@@ -4,7 +4,9 @@ This is a list of recipes for getting stuff done with this project.
 
 Most commonly used
 =====
-git flow feature finish personal_groups
+git add .
+git commit
+git flow feature finish simple_send
 
 # aliases i use to setup the environ
 rapaf
@@ -85,6 +87,14 @@ Setup Pycharm
 ========
 Choose the correct python interpreter in project settings
 i.e. the one from afrims-dev/bin
+
+Note: it works well if you open the afrims as the dev dir
+version control will not work (you need to use the command line for this)
+but ./manage.py and running the server will work from here
+
+if you run from the dev root i.e. afrims-paging/
+then you will need to set, the DJANGO_SETTINGS environment var
+and set the working directory to be afrims (so the db.sqlite3) will be shared
 
 Get the latest version of rapidsms
 =======

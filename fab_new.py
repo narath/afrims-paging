@@ -64,7 +64,7 @@ def setup_dirs():
 
 def staging():
     """ use staging environment on remote host"""
-    env.code_branch = 'release/0.1'
+    env.code_branch = 'develop'
     env.sudo_user = 'rapidsms'
     env.environment = 'staging'
     env.server_port = '9002'

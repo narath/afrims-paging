@@ -26,6 +26,23 @@ couchdb
 # if you added another field to contacts, you can update the migrations with South
 ./manage.py schemamigration rapidsms --auto
 
+Deploy
+======
+# in a directory above this dev tree
+git clone https://github.com/dimagi/deployment-utils
+cp fabfile.py ../afrims-paging/fab_new.py
+
+# on deployment machine
+# recommend setting up afrims user
+# give su powers
+sudo visudo
+
+pip install fabric
+#todo: add to requirements
+
+fab -f fab_new.py staging bootstrap --user=rapidsms
+
+
 Setting up
 ==========
 Follow the setup from afrims

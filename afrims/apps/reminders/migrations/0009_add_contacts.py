@@ -8,17 +8,18 @@ class Migration(DataMigration):
 
     def forwards(self, orm):
         "Write your forwards methods here."
-        group, _ = orm['groups.Group'].objects.get_or_create(name='Subjects')
-        group.is_editable = False
-        group.save()
-        for patient in orm.Patient.objects.all():
-            patient.contact.name = patient.subject_number
-            patient.contact.phone = patient.mobile_number
-            patient.contact.pin = patient.pin
-            patient.contact.save()
-            patient.save()
-            patient.contact.groups.add(group)
-
+#        group, _ = orm['groups.Group'].objects.get_or_create(name='Subjects')
+#        group.is_editable = False
+#        group.is_personal_group = False
+#        group.save()
+#        for patient in orm.Patient.objects.all():
+#            patient.contact.name = patient.subject_number
+#            patient.contact.phone = patient.mobile_number
+#            patient.contact.pin = patient.pin
+#            patient.contact.save()
+#            patient.save()
+#            patient.contact.groups.add(group)
+# had to remove this because it was preventing migration from happening (after adding is_personal_group field
 
     def backwards(self, orm):
         "Write your backwards methods here."

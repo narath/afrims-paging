@@ -107,7 +107,6 @@ LOGIN_REDIRECT_URL = "/"
 # all manually is tiresome and error-prone.
 TEST_RUNNER = "django_nose.NoseTestSuiteRunner"
 
-
 # for some reason this setting is blank in django's global_settings.py,
 # but it is needed for static assets to be linkable.
 MEDIA_URL = "/media/"
